@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<usertypes>
+    <type name="mac" size="6"/>
+    <type name="ethernet" size="14">
+        <mac name="dst"/>
+        <mac name="src"/>
+        <uint16 name="type"/>
+    </type>
+
+    <type name="cap_header" size="0">
+
+    </type>
+</usertypes>
