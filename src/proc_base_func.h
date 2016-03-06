@@ -15,6 +15,7 @@ namespace ivk {
     uint32_t cmd_fclose(void* el);
     uint32_t cmd_malloc(void* el);
     uint32_t cmd_free(void* el);
+    uint32_t cmd_while(void* el);
 };
 
 #endif //INVOKER_PROC_BASE_FUNC_H

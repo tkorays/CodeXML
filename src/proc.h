@@ -7,12 +7,13 @@
 
 #include<map>
 #include<string>
+#include "../3rdparty/tinyxml2/tinyxml2.h"
 
 namespace ivk {
     typedef uint32_t (*cmd_func)(void* param);
     typedef enum{
         proc_no_err=0,
-        proc_sucess=0,
+        proc_success =0,
         proc_failed,
         proc_param_err,
         proc_exec_err,
@@ -41,11 +42,15 @@ namespace ivk {
 
     };
     extern std::map<std::string,cmd_func> gCmdFuncMap;
+    extern std::map<std::string,tinyxml2::XMLElement*> gUserCmdMap;
     extern std::map<std::string,proc_data> gCmdMemMap;
     extern std::map<std::string,uint32_t> gBaseTypeMap;
 
+
     uint32_t proc_exec(void* el);
     uint32_t proc_install();
+    uint32_t proc_add_cmds(tinyxml2::XMLElement* el);
+    const char* get_attr_val(tinyxml2::XMLElement** el, const char* attr_name);
 
 };
 

@@ -23,7 +23,7 @@ uint32_t cmd_b(void* p){
 }
 
 uint32_t dump(void* p){
-    XMLElement* e = (XMLElement*)p;
+    XMLElement* e = *(XMLElement**)p;
 
     const char* me = e->Attribute("memory");
     if(!me){
@@ -40,13 +40,13 @@ uint32_t dump(void* p){
         cout<<(int)data[i]<<",";
     }
     cout<<endl;
-    return proc_sucess;
+    return proc_success;
 }
 
 int main(){
     XMLDocument doc;
     XMLError err = XML_NO_ERROR;
-    err = doc.LoadFile("/Users/tkorays/invoker/task.xml");
+    err = doc.LoadFile("/Users/tkorays/invoker/res/simple_task.xml");
     if(err!=XML_NO_ERROR){
         cout<<"Open File Failed"<<endl;
         return 0;
@@ -59,11 +59,28 @@ int main(){
         return 0;
     }
 
+    XMLDocument cmds;
+    err = cmds.LoadFile("/Users/tkorays/invoker/res/mycmds.xml");
+    if(err!=XML_NO_ERROR){
+        cout<<"open file failed"<<endl;
+        return 0;
+    }
+    XMLElement* cmd = cmds.FirstChildElement("cmds");
+    if(!cmd){
+        cout<<"root node must b a cmds"<<endl;
+        return 0;
+    }
+    proc_add_cmds(cmd);
+
+
     proc_install();
     gCmdFuncMap.insert(pair<string,cmd_func>("cmd_a",cmd_a));
     gCmdFuncMap.insert(pair<string,cmd_func>("cmd_b",cmd_b));
     gCmdFuncMap.insert(pair<string,cmd_func>("dump",dump));
-    proc_exec(e);
+    XMLElement* els[2];
+    els[0] = e;
+    els[1] = 0;
+    proc_exec(els);
 
     return 0;
 }

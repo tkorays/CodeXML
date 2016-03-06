@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <proc>
-    <fopen handle="fr" file="/Users/tkorays/invoker/test1.txt" mode="rb"/>
-    <fopen handle="fw" file="/Users/tkorays/invoker/test2.txt" mode="wb"/>
+    <fopen handle="fr" file="/Users/tkorays/invoker/tmp/test1.txt" mode="rb"/>
+    <fopen handle="fw" file="/Users/tkorays/invoker/tmp/test2.txt" mode="wb"/>
 
 
     <proc name="read_write">

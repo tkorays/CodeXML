@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<proc>
+    <fopen handle="fr" file="/Users/tkorays/invoker/tmp/test1.txt" mode="rb"/>
+    <fopen handle="fw" file="/Users/tkorays/invoker/tmp/test2.txt" mode="wb"/>
+    <proc>
+        <malloc memory="read_mem" type="char" size="5"/>
+        <fwrite handle="fw" data="read data:" newline="true"/>
+        <fread handle="fr" memory="read_mem"/>
+        <fwrite handle="fw" memory="read_mem"/>
+        <dump memory="read_mem"/>
+        <free memory="read_mem"/>
+    </proc>
+    <fclose handle="fr"/>
+    <fclose handle="fw"/>
+    <write_file handle="fh1" file="/Users/tkorays/invoker/tmp/test3.txt" data="abcdefg"/>
+</proc>

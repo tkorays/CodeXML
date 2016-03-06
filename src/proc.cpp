@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <string>
+#include <iostream>
 
 #include "proc.h"
 #include "proc_base_func.h"
@@ -14,6 +15,7 @@ using namespace tinyxml2;
 using namespace std;
 
 std::map<std::string,cmd_func> ivk::gCmdFuncMap;
+std::map<std::string,tinyxml2::XMLElement*> ivk::gUserCmdMap;
 std::map<std::string,proc_data> ivk::gCmdMemMap;
 std::map<std::string,uint32_t> ivk::gBaseTypeMap;
 
@@ -55,23 +57,42 @@ uint32_t ivk::proc_exec(void* el){
         return proc_exec_null;
     }
 
-    XMLElement* r = (XMLElement*)el;
+    XMLElement* r = *(XMLElement**)el;
     XMLElement* e = r->FirstChildElement();
     while(e){
         const char* cmd_name = e->Name();
+
+        // 先在系统的cmd函数表中查询
         map<string,cmd_func>::iterator it = gCmdFuncMap.find(cmd_name);
-        if(it==gCmdFuncMap.end()){
+        XMLElement* elements[2];
+        elements[0] = e;
+        elements[1] = *((XMLElement**)el+1);
+        if(it!=gCmdFuncMap.end()){
+            uint32_t err = it->second((void*)elements);
+            if(err != proc_no_err){
+                return proc_exec_err;
+            }
             e = e->NextSiblingElement();
             continue;
         }
 
-        uint32_t err = it->second((void*)e);
-        if(err != proc_no_err){
-            return proc_exec_err;
+        // 系统的cmd函数表中没有则查找用户cmd表
+        map<string,XMLElement*>::iterator it_user = gUserCmdMap.find(cmd_name);
+        if(it_user!=gUserCmdMap.end()){
+
+            // 将当前结点挂载在某个结点上执行
+            XMLElement* els[2];
+            els[0] = it_user->second;
+            els[1] = e;
+            proc_exec(els);
+
+            e = e->NextSiblingElement();
+            continue;
         }
+
         e = e->NextSiblingElement();
     }
-    return proc_sucess;
+    return proc_success;
 }
 
 uint32_t ivk::proc_install(){
@@ -104,5 +125,47 @@ uint32_t ivk::proc_install(){
     return proc_no_err;
 }
 
+uint32_t ivk::proc_add_cmds(XMLElement* el){
+    if(!el){
+        return proc_mem_err;
+    }
+
+    XMLElement* e = el->FirstChildElement();
+    while(e){
+        const char* cmd_name = e->Attribute("name");
+        if(!cmd_name){
+            e = e->NextSiblingElement();
+            continue;
+        }
+        gUserCmdMap.insert(pair<string,XMLElement*>(cmd_name,e));
+
+        e = e->NextSiblingElement();
+    }
+
+    return proc_success;
+}
 
 
+const char* ivk::get_attr_val(tinyxml2::XMLElement** el, const char* attr_name){
+    if(!el || !attr_name){
+        return 0;
+    }
+    // 先获取自己的value,判断是否以@开头,是的话需要请求父节点
+    const char* val = (*el)->Attribute(attr_name);
+    if(!val){
+        return 0;
+    }
+    if(val[0]=='@'){
+        string n(val);
+        string root_name = n.substr(1,n.length());
+        // 获取挂载结点
+        XMLElement* el_root = *(el+1);
+        if(!el_root){
+            return 0;
+        }
+        const char* ret = el_root->Attribute(root_name.c_str());
+        return ret;
+    }else{
+        return val;
+    }
+}
