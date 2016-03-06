@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<proc>
+    <fopen handle="fr" file="/Users/tkorays/invoker/test1.txt" mode="rb"/>
+    <fopen handle="fw" file="/Users/tkorays/invoker/test2.txt" mode="wb"/>
+
+
+    <proc name="read_write">
+        <malloc memory="cap_header" type="cap_header"/>
+        <fread handle="fr" memory="cap_header"/>
+        <fwrite handle="fw" memory="cap_header"/>
+        <free  memory="cap_header"/>
+
+        <malloc memory="pkt_header" type="pkt_header"/>
+        <malloc memory="buff" type="char" size="1024"/>
+
+        <setret value="1"/>
+        <fread handle="fr" memory="pkt_header"/>
+        <while>
+            <fread memory="buff" size="@ret"/>
+        </while>
+        <malloc memory="ethernet" type="ethernet"/>
+
+        <free memory="ethernet"/>
+    </proc>
+
+    <dump memory="m1"/>
+    <free memory="m1"/>
+
+    <fclose handle="fr"/>
+    <fclose handle="fw"/>
+</proc>
