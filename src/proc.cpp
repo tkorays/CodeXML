@@ -123,6 +123,8 @@ uint32_t ivk::proc_install(){
     gCmdFuncMap.insert(pair<string,cmd_func>("free",ivk::cmd_free));
     gCmdFuncMap.insert(pair<string,cmd_func>("while",ivk::cmd_while));
     gCmdFuncMap.insert(pair<string,cmd_func>("if",ivk::cmd_if));
+    gCmdFuncMap.insert(pair<string,cmd_func>("add64",ivk::cmd_add64));
+    gCmdFuncMap.insert(pair<string,cmd_func>("sub64",ivk::cmd_sub64));
 
     gCmdFuncMap.insert(pair<string,cmd_func>("setret",ivk::cmd_set_ret));
     gCmdFuncMap.insert(pair<string,cmd_func>("setmem",ivk::cmd_set_mem));

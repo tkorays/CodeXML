@@ -5,7 +5,14 @@
         <fwrite handle="@handle" data="@data"/>
         <fclose handle="@handle"/>
     </cmd>
-    <cmd name="add32">
-        <add type="char" a="va" b="vb" out="va"/>
+    <cmd name="clear_int64">
+        <setmem memory="@memory" offset="0" byte="0"/>
+        <setmem memory="@memory" offset="1" byte="0"/>
+        <setmem memory="@memory" offset="2" byte="0"/>
+        <setmem memory="@memory" offset="3" byte="0"/>
+        <setmem memory="@memory" offset="4" byte="0"/>
+        <setmem memory="@memory" offset="5" byte="0"/>
+        <setmem memory="@memory" offset="6" byte="0"/>
+        <setmem memory="@memory" offset="7" byte="0"/>
     </cmd>
 </cmds>

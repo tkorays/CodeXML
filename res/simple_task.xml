@@ -40,4 +40,27 @@
     <setret value="0"/>
     <setmem memory="ret" offset="1" byte="5"/>
     <dump memory="ret"/>
+
+    <proc name="add_and_sub">
+        <malloc memory="va" type="int64"/>
+        <malloc memory="vb" type="int64"/>
+        <malloc memory="vo" type="int64"/>
+        <clear_int64 memory="va"/>
+        <clear_int64 memory="vb"/>
+
+        <setmem memory="va" offset="0" byte="0"/>
+        <setmem memory="va" offset="1" byte="5"/>
+        <setmem memory="vb" offset="0" byte="0"/>
+        <setmem memory="vb" offset="1" byte="2"/>
+
+        <dump memory="va"/>
+        <dump memory="vb"/>
+
+        <sub64 va="va" vb="vb" vo="va"/>
+        <dump memory="va"/>
+
+        <free memory="va"/>
+        <free memory="vb"/>
+        <fread memory="vo"/>
+    </proc>
 </proc>

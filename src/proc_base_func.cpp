@@ -314,7 +314,7 @@ uint32_t ivk::cmd_set_mem(void *el) {
     XMLElement** ppEl = (XMLElement**)el;
     XMLElement* pEl = *ppEl;
 
-    const char* me = pEl->Attribute("memory");
+    const char* me = get_attr_val(ppEl,"memory");
     if(!me){
         return proc_xml_err;
     }
@@ -337,6 +337,76 @@ uint32_t ivk::cmd_set_mem(void *el) {
 
     char* dt = it->second.data;
     dt[of] = (uint8_t)bt;
+
+    return proc_success;
+}
+
+uint32_t ivk::cmd_add64(void *el) {
+    if(!el){
+        return proc_param_err;
+    }
+    XMLElement** ppEl = (XMLElement**)el;
+    XMLElement* pEl = *ppEl;
+
+    const char* va = get_attr_val(ppEl,"va");
+    const char* vb = get_attr_val(ppEl,"vb");
+    const char* vo = get_attr_val(ppEl,"vo");
+    if(!va || !vb || !vo){
+        return proc_xml_err;
+    }
+    // get mem
+    map<string,proc_data>::iterator it = gCmdMemMap.find(va);
+    if(it==gCmdMemMap.end()){
+        return proc_mem_err;
+    }
+    int64_t a = *(int64_t*)it->second.data;
+
+    it = gCmdMemMap.find(vb);
+    if(it==gCmdMemMap.end()){
+        return proc_mem_err;
+    }
+    int64_t b = *(int64_t*)it->second.data;
+
+    it = gCmdMemMap.find(vo);
+    if(it==gCmdMemMap.end()){
+        return proc_mem_err;
+    }
+    *(int64_t*)it->second.data = a+b;
+
+    return proc_success;
+}
+
+uint32_t ivk::cmd_sub64(void *el) {
+    if(!el){
+        return proc_param_err;
+    }
+    XMLElement** ppEl = (XMLElement**)el;
+    XMLElement* pEl = *ppEl;
+
+    const char* va = get_attr_val(ppEl,"va");
+    const char* vb = get_attr_val(ppEl,"vb");
+    const char* vo = get_attr_val(ppEl,"vo");
+    if(!va || !vb || !vo){
+        return proc_xml_err;
+    }
+    // get mem
+    map<string,proc_data>::iterator it = gCmdMemMap.find(va);
+    if(it==gCmdMemMap.end()){
+        return proc_mem_err;
+    }
+    int64_t a = *(int64_t*)it->second.data;
+
+    it = gCmdMemMap.find(vb);
+    if(it==gCmdMemMap.end()){
+        return proc_mem_err;
+    }
+    int64_t b = *(int64_t*)it->second.data;
+
+    it = gCmdMemMap.find(vo);
+    if(it==gCmdMemMap.end()){
+        return proc_mem_err;
+    }
+    *(int64_t*)it->second.data = a-b;
 
     return proc_success;
 }
