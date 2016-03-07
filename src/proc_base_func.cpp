@@ -268,6 +268,28 @@ uint32_t ivk::cmd_while(void* el){
     return proc_success;
 }
 
+uint32_t ivk::cmd_if(void* el){
+    if(!el){
+        return proc_param_err;
+    }
+
+    XMLElement** ppEl = (XMLElement**)el;
+    XMLElement* pEl = *ppEl;
+
+    // 读取返回值ret
+    map<string,proc_data>::iterator it = gCmdMemMap.find("ret");
+    if(it==gCmdMemMap.end()){
+        return proc_mem_err;
+    }
+
+    // 如果ret非0,则继续执行这个
+    uint32_t ret = *(uint32_t*)it->second.data;
+    if(ret){
+        proc_exec(el); // 执行while中所有指令,并可能对ret值做修改
+    }
+    return proc_success;
+}
+
 
 uint32_t ivk::cmd_set_ret(void *el) {
     if(!el){

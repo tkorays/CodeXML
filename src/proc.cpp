@@ -122,6 +122,7 @@ uint32_t ivk::proc_install(){
     gCmdFuncMap.insert(pair<string,cmd_func>("malloc",ivk::cmd_malloc));
     gCmdFuncMap.insert(pair<string,cmd_func>("free",ivk::cmd_free));
     gCmdFuncMap.insert(pair<string,cmd_func>("while",ivk::cmd_while));
+    gCmdFuncMap.insert(pair<string,cmd_func>("if",ivk::cmd_if));
 
     gCmdFuncMap.insert(pair<string,cmd_func>("setret",ivk::cmd_set_ret));
 

@@ -16,6 +16,7 @@ namespace ivk {
     uint32_t cmd_malloc(void* el);
     uint32_t cmd_free(void* el);
     uint32_t cmd_while(void* el);
+    uint32_t cmd_if(void* el);
     uint32_t cmd_set_ret(void*el);
 
     uint32_t setret(uint32_t r);

@@ -22,4 +22,18 @@
         <cmd_a/>
         <setret value="0"/>
     </while>
+
+    <proc>
+        <setret value="1"/>
+        <if>
+            <cmd_b/>
+        </if>
+        <dump memory="ret"/>
+
+        <setret value="0"/>
+        <if>
+            <cmd_a/>
+        </if>
+        <dump memory="ret"/>
+    </proc>
 </proc>
