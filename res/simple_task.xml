@@ -13,4 +13,13 @@
     <fclose handle="fr"/>
     <fclose handle="fw"/>
     <write_file handle="fh1" file="/Users/tkorays/invoker/tmp/test3.txt" data="abcdefg"/>
+    <proc>
+        <setret value="12"/>
+        <dump memory="ret"/>
+    </proc>
+    <setret value="1"/>
+    <while>
+        <cmd_a/>
+        <setret value="0"/>
+    </while>
 </proc>

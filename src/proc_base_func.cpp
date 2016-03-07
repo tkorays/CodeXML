@@ -11,6 +11,16 @@
 using namespace tinyxml2;
 using namespace std;
 
+
+uint32_t ivk::setret(uint32_t r) {
+    map<string,ivk::proc_data>::iterator it = ivk::gCmdMemMap.find("ret");
+    if(it==ivk::gCmdMemMap.end()){
+        return ivk::proc_mem_err;
+    }
+    *(uint32_t*)it->second.data = r;
+    return ivk::proc_success;
+}
+
 uint32_t ivk::cmd_fopen(void* el){
     XMLElement** ep = (XMLElement**)el;
     XMLElement* e = *(XMLElement**)el;
@@ -150,13 +160,8 @@ uint32_t ivk::cmd_fread(void* el){
     }
     uint32_t ret = (uint32_t)fread(itm->second.data,1,mem_size,f);
 
-    // ret内存变量为系统定义,一定存在,除非你干了些什么
-    map<string,proc_data>::iterator itr = gCmdMemMap.find("ret");
-    if(itr==gCmdMemMap.end()){
-        return proc_mem_err;
-    }
-    // 写入返回大小
-    *(uint32_t*)itr->second.data = ret;
+    // 设置返回值为读取字节大小
+    ivk::setret(ret);
 
     return proc_success;
 }
@@ -236,4 +241,45 @@ uint32_t ivk::cmd_free(void *el) {
     gCmdMemMap.erase(me);
 
     return proc_success;
+}
+
+// 判断ret值,如果非0,则继续
+uint32_t ivk::cmd_while(void* el){
+    if(!el){
+        return proc_param_err;
+    }
+
+    XMLElement** ppEl = (XMLElement**)el;
+    XMLElement* pEl = *ppEl;
+
+    // 读取返回值ret
+    map<string,proc_data>::iterator it = gCmdMemMap.find("ret");
+    if(it==gCmdMemMap.end()){
+        return proc_mem_err;
+    }
+
+    // 如果ret非0,则继续执行这个
+    uint32_t ret = *(uint32_t*)it->second.data;
+    if(ret){
+        proc_exec(el); // 执行while中所有指令,并可能对ret值做修改
+        cmd_while(el);
+    }
+
+    return proc_success;
+}
+
+
+uint32_t ivk::cmd_set_ret(void *el) {
+    if(!el){
+        return proc_param_err;
+    }
+    XMLElement** ppEl = (XMLElement**)el;
+    XMLElement* pEl = *ppEl;
+    int ret=0;
+    XMLError er = pEl->QueryIntAttribute("value",&ret);
+    if(er!=XML_NO_ERROR){
+        return proc_xml_err;
+    }
+
+    return ivk::setret((uint32_t)ret);
 }
