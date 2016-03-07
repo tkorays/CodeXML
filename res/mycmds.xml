@@ -5,4 +5,7 @@
         <fwrite handle="@handle" data="@data"/>
         <fclose handle="@handle"/>
     </cmd>
+    <cmd name="add32">
+        <add type="char" a="va" b="vb" out="va"/>
+    </cmd>
 </cmds>

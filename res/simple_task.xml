@@ -36,4 +36,8 @@
         </if>
         <dump memory="ret"/>
     </proc>
+
+    <setret value="0"/>
+    <setmem memory="ret" offset="1" byte="5"/>
+    <dump memory="ret"/>
 </proc>

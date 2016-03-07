@@ -305,3 +305,38 @@ uint32_t ivk::cmd_set_ret(void *el) {
 
     return ivk::setret((uint32_t)ret);
 }
+
+
+uint32_t ivk::cmd_set_mem(void *el) {
+    if(!el){
+        return proc_param_err;
+    }
+    XMLElement** ppEl = (XMLElement**)el;
+    XMLElement* pEl = *ppEl;
+
+    const char* me = pEl->Attribute("memory");
+    if(!me){
+        return proc_xml_err;
+    }
+    int of = 0;
+    XMLError er = pEl->QueryIntAttribute("offset",&of);
+    if(er!=XML_NO_ERROR){
+        of = 0;
+    }
+
+    int bt = 0;
+    er = pEl->QueryIntAttribute("byte",&bt);
+    if(er!=XML_NO_ERROR){
+        return proc_xml_err;
+    }
+
+    map<string,proc_data>::iterator it = gCmdMemMap.find(me);
+    if(it==gCmdMemMap.end()){
+        return proc_mem_err;
+    }
+
+    char* dt = it->second.data;
+    dt[of] = (uint8_t)bt;
+
+    return proc_success;
+}

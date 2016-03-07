@@ -125,6 +125,7 @@ uint32_t ivk::proc_install(){
     gCmdFuncMap.insert(pair<string,cmd_func>("if",ivk::cmd_if));
 
     gCmdFuncMap.insert(pair<string,cmd_func>("setret",ivk::cmd_set_ret));
+    gCmdFuncMap.insert(pair<string,cmd_func>("setmem",ivk::cmd_set_mem));
 
     return proc_no_err;
 }
