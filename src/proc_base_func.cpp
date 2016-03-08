@@ -25,9 +25,6 @@ uint32_t ivk::cmd_fopen(void* el){
     XMLElement** ep = (XMLElement**)el;
     XMLElement* e = *(XMLElement**)el;
 
-    //const char* hd = e->Attribute("handle");
-    //const char* md = e->Attribute("mode");
-    //const char* fn = e->Attribute("file");
     const char* hd = get_attr_val(ep,"handle");
     const char* md = get_attr_val(ep,"mode");
     const char* fn = get_attr_val(ep,"file");
@@ -45,10 +42,6 @@ uint32_t ivk::cmd_fwrite(void* el){
     XMLElement** ep = (XMLElement**)el;
     XMLElement* e = *(XMLElement**)el;
 
-    //const char* hd = e->Attribute("handle");
-    //const char* dt = e->Attribute("data");
-    //const char* me = e->Attribute("memory");
-    //const char* nl = e->Attribute("newline");
     const char* hd = get_attr_val(ep,"handle");
     const char* dt = get_attr_val(ep,"data");
     const char* me = get_attr_val(ep,"memory");
@@ -108,10 +101,6 @@ uint32_t ivk::cmd_fwrite(void* el){
 uint32_t ivk::cmd_fread(void* el){
     XMLElement** ep = (XMLElement**)el;
     XMLElement* e = *(XMLElement**)el;
-
-    //const char* hd = e->Attribute("handle");
-    //const char* me = e->Attribute("memory");
-    //const char* ty = e->Attribute("type");
 
     const char* hd = get_attr_val(ep,"handle");
     const char* me = get_attr_val(ep,"memory");
@@ -196,9 +185,6 @@ uint32_t ivk::cmd_malloc(void *el) {
     XMLElement** ep = (XMLElement**)el;
     XMLElement* e = *(XMLElement**)el;
 
-    //const char* me = e->Attribute("memory");
-    //const char* ty = e->Attribute("type");
-
     const char* me = get_attr_val(ep,"memory");
     const char* ty = get_attr_val(ep,"type");
     int sz=0;
@@ -225,7 +211,6 @@ uint32_t ivk::cmd_free(void *el) {
     XMLElement** ep = (XMLElement**)el;
     XMLElement* e = *(XMLElement**)el;
 
-    //const char* me = e->Attribute("memory");
     const char* me = get_attr_val(ep,"memory");
     if(!me){
         return proc_xml_err;
