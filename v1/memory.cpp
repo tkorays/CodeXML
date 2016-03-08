@@ -10,6 +10,9 @@ namespace tk{
 
     // _data start
     // ************************************************
+    _data::_data():data(0),size(0),owned(0) {
+    }
+
     _data::_data(uint32_t sz){
         this->data = (char*)malloc(sz);
         if(!this->data){
@@ -49,6 +52,25 @@ namespace tk{
         if(this->owned){
             free(this->data);
         }
+    }
+
+    // 对于已经管理了内存的对象不允许占有其他对象内存
+    bool _data::own(_data &dt) {
+        if(this->owned){
+            return false;
+        }
+        if(dt.owned){
+            this->data = dt.data;
+            this->size = dt.size;
+            this->owned = true;
+
+            dt.owned = false;
+            dt.data = 0;
+            dt.size = 0;
+            return true;
+        }
+        this->owned = false;
+        return false;
     }
 
     uint32_t _data::write(const char* dt, uint32_t tsize, uint32_t offset){
