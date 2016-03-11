@@ -10,7 +10,7 @@ namespace tk{
     XMLNode::XMLNode(string _name):parent(0),firstChild(0),next(0) ,name(_name) {
     }
     XMLNode::~XMLNode() {
-
+        this->removeChildren();
     }
     string XMLNode::getName() {
         return this->name;
