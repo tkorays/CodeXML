@@ -19,7 +19,19 @@ int main() {
     node_2->setText("hello world");
 
     root->addChild(node_1);
-    node_1->addChild(node_2);
+    root->addChild(node_2);
+
+    node_1 = 0;
+    node_2 = 0;
+
+    XMLNode* n = root->getFirstChild();
+    if(n){
+        cout<<n->getName()<<endl;
+    }
+
+    root->removeChildren();
+
+
 
     cout<<root->toString()<<endl;
 

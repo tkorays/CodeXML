@@ -43,6 +43,7 @@ namespace tk {
 
         XMLNode* getFirstChild();
         void addChild(XMLNode* node);
+        void removeChildren();
 
         XMLNode* getNext();
         void setNext(XMLNode* node);

@@ -68,6 +68,25 @@ namespace tk{
         node->parent = this;
 
     }
+
+    void XMLNode::removeChildren() {
+        XMLNode* node = this->firstChild;
+        XMLNode* del  = 0;
+        if(!node){
+            return ;
+        }
+        while(node){
+            del = node;
+            node = node->next;
+            if(del->firstChild){
+                del->removeChildren();
+            }else{
+                delete del;
+            }
+        }
+        this->firstChild = 0;
+    }
+
     XMLNode* XMLNode::getNext() {
         return this->next;
     }
