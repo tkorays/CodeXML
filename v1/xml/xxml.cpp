@@ -4,10 +4,10 @@
 
 namespace tk{
 
-    XMLNode::XMLNode():parent(0),firstChild(0),next(0),openTag(false) {
+    XMLNode::XMLNode():parent(0),firstChild(0),next(0) {
 
     }
-    XMLNode::XMLNode(string _name):parent(0),firstChild(0),next(0) ,name(_name),openTag(false) {
+    XMLNode::XMLNode(string _name):parent(0),firstChild(0),next(0) ,name(_name) {
     }
     XMLNode::~XMLNode() {
 
@@ -56,7 +56,7 @@ namespace tk{
     void XMLNode::addChild(XMLNode *node) {
         XMLNode* first = this->firstChild;
         if(!first){
-            first = node;
+            this->firstChild = node;
             node->parent = this;
             return ;
         }
@@ -90,29 +90,31 @@ namespace tk{
     }
 
     void XMLNode::setText(string _text) {
-        this->openTag = true;
         this->text = _text;
     }
 
     string XMLNode::toString() {
         stringstream ss;
-        ss<<"<"<<this->name<<" ";
+        ss<<"<"<<this->name;
         map<string,string>::iterator it = attributes.begin();
         while(it!=attributes.end()){
-            ss<<it->first<<"=\""<<it->second<<"\" ";
+            ss<<" "<<it->first<<"=\""<<it->second<<"\"";
             it++;
         }
-        if(!openTag){
+        // 不存在子结点且text为空,则闭合标签
+        // 首先考虑是否存在子结点
+        if(!firstChild && text.empty()){
             ss<<"/>";
-        }else{
-            // 若有text结点则考虑text结点
-            if(!this->text.empty()){
-                ss<<">"<<this->text<<"</"<<this->name<<">";
-            }else{
-
+        }else if(firstChild){
+            ss<<">";
+            while(firstChild){
+                ss<<firstChild->toString();
+                firstChild = firstChild->getNext();
             }
+            ss<<"</"<<this->name<<">";
+        }else{
+            ss<<">"<<this->text<<"</"<<this->name<<">";
         }
-
         return ss.str();
     }
 

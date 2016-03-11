@@ -26,7 +26,6 @@ namespace tk {
         XMLNode*             parent;
         XMLNode*             firstChild;
         XMLNode*             next;
-        bool                 openTag;
 
 
         XMLNode(const XMLNode&);
