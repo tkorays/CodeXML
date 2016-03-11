@@ -5,6 +5,7 @@
 #include "memory.h"
 #include <stdlib.h>
 #include <string.h>
+using namespace std;
 
 namespace tk{
 
@@ -88,5 +89,6 @@ namespace tk{
     }
     // ************************************************
     // _data end
+
 
 }

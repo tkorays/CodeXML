@@ -6,6 +6,8 @@
 #define INVOKER_MEMORY_H
 
 #include "stdint.h"
+#include <map>
+#include <string>
 
 namespace tk{
     typedef enum{
@@ -34,6 +36,7 @@ namespace tk{
         uint32_t write(const char* dt, uint32_t tsize, uint32_t offset = 0);
         const char* read(uint32_t tsize, uint32_t offset);
     };
+
 
 };
 
