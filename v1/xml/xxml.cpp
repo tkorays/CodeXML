@@ -136,5 +136,11 @@ namespace tk{
         }
         return ss.str();
     }
+    XMLNode* XMLNode::loadFromString(string s) {
+        return 0;
+    }
 
+    XMLNode* XMLNode::loadFromFile(string fn) {
+        return 0;
+    }
 };

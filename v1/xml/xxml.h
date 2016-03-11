@@ -3,20 +3,10 @@
 
 #include <string>
 #include <map>
+#include <cstdint>
 using namespace std;
 
 namespace tk {
-    typedef int xml_ret;
-    typedef enum {
-        XML_NO_ERROR=0,
-        XML_SUCCESS=0,
-        XML_ERROR,
-        XML_NO_ATTRIBUTE,
-        XML_PARSE_ERR,
-
-    };
-    class XMLNode;
-    class XMLElement;
 
     class XMLNode {
     private:
@@ -29,6 +19,7 @@ namespace tk {
 
 
         XMLNode(const XMLNode&);
+        XMLNode& operator=(const XMLNode&);
     public:
         XMLNode();
         XMLNode(string _name);
@@ -36,6 +27,9 @@ namespace tk {
         string getName();
         void   setName(string _name);
         string getAttribute(string _name);
+
+        int32_t getIntAttribute(string _name,int32_t dft=0);
+
         void   setAttribute(string _name, string _value);
         void   removeAttribute(string _name);
         XMLNode* getParent();
@@ -53,7 +47,8 @@ namespace tk {
         void setText(string _text);
 
         string toString();
-        string fromString(string s);
+        static XMLNode* loadFromFile(string fn);
+        static XMLNode* loadFromString(string s);
     };
 };
 
