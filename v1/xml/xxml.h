@@ -20,35 +20,61 @@ namespace tk {
 
         XMLNode(const XMLNode&);
         XMLNode& operator=(const XMLNode&);
+
+        string      toString();
     public:
         XMLNode();
         XMLNode(string _name);
         ~XMLNode();
-        string getName();
-        void   setName(string _name);
-        string getAttribute(string _name);
 
-        int32_t getIntAttribute(string _name,int32_t dft=0);
+        string      getName();
+        void        setName(string _name);
 
-        void   setAttribute(string _name, string _value);
-        void   removeAttribute(string _name);
-        XMLNode* getParent();
-        void     setParent(XMLNode* _parent);
+        string      getAttribute(string _name);
+        int32_t     getIntAttribute(string _name,int32_t dft=0);
+        void        setAttribute(string _name, string _value);
+        void        removeAttribute(string _name);
 
-        XMLNode* getFirstChild();
-        void addChild(XMLNode* node);
-        void removeChildren();
+        XMLNode*    getParent();
+        void        setParent(XMLNode* _parent);
 
-        XMLNode* getNext();
-        void setNext(XMLNode* node);
-        void insertNext(XMLNode* node);
-        void removeNext();
+        XMLNode*    getFirstChild();
+        void        addChild(XMLNode* node);
+        void        removeChildren();
 
-        void setText(string _text);
+        XMLNode*    getNext();
+        void        setNext(XMLNode* node);
+        void        insertNext(XMLNode* node);
+        void        removeNext();
 
-        string toString();
-        static XMLNode* loadFromFile(string fn);
-        static XMLNode* loadFromString(string s);
+        void        setText(string _text);
+
+
+        friend  class XMLDoc;
+
+    };
+
+
+    class XMLDoc {
+    private:
+        string                  version;
+        string                  encoding;
+        XMLNode*                root;
+        uint32_t                err;
+        static map<uint16_t,string> errInfo;
+    public:
+        XMLDoc();
+        ~XMLDoc();
+        void        release();
+        void        setRoot(XMLNode* r);
+
+        string      toString();
+        uint16_t    getErrCode();
+        string      getErrInfo();
+        string      getErrInfo(uint16_t code);
+
+        static XMLDoc* loadFromFile(string fn);
+        static XMLDoc* loadFromString(string s);
     };
 };
 

@@ -1,6 +1,7 @@
 #include "xxml.h"
 
 #include <sstream>
+#include <fstream>
 
 namespace tk{
 
@@ -112,6 +113,7 @@ namespace tk{
         this->text = _text;
     }
 
+    // TODO 需要美化输出格式
     string XMLNode::toString() {
         stringstream ss;
         ss<<"<"<<this->name;
@@ -136,11 +138,51 @@ namespace tk{
         }
         return ss.str();
     }
-    XMLNode* XMLNode::loadFromString(string s) {
-        return 0;
+
+
+    XMLDoc::XMLDoc() {
+        version     = "1.0";
+        encoding    = "UTF-8";
+        root        = 0;
+    }
+    XMLDoc::~XMLDoc() {
+        release();
+    }
+    void XMLDoc::release() {
+        if(root){
+            delete root;
+            root = 0;
+        }
+    }
+    void XMLDoc::setRoot(XMLNode *r) {
+        root = r;
     }
 
-    XMLNode* XMLNode::loadFromFile(string fn) {
-        return 0;
+    string XMLDoc::toString() {
+        stringstream ss;
+        ss<<"<?xml version=\""<<
+            version<<"\" encoding=\""<<
+            encoding<<"\"?>";
+        if(root){
+            ss<<root->toString();
+        }
+        return ss.str();
     }
+
+    XMLDoc* XMLDoc::loadFromFile(string fn) {
+        XMLDoc* doc = new XMLDoc();
+        fstream fs(fn);
+
+        // 先判断文件是否存在
+        if(!fs.is_open()){
+            delete doc;
+            return 0;
+        }
+
+        
+    }
+
+
+
+
 };

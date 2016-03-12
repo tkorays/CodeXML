@@ -29,11 +29,10 @@ int main() {
         cout<<n->getName()<<endl;
     }
 
-    root->removeChildren();
+    XMLDoc* doc = new XMLDoc();
+    doc->setRoot(root);
 
-
-
-    cout<<root->toString()<<endl;
+    cout<<doc->toString()<<endl;
 
 
 
