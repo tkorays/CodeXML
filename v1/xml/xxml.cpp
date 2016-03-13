@@ -169,17 +169,19 @@ namespace tk{
         return ss.str();
     }
 
+    // 为了效率,这里最好还是用c写,不用C++技术
     XMLDoc* XMLDoc::loadFromFile(string fn) {
-        XMLDoc* doc = new XMLDoc();
-        fstream fs(fn);
-
-        // 先判断文件是否存在
-        if(!fs.is_open()){
-            delete doc;
+        FILE* f = fopen(fn.c_str(),"r");
+        if(!f){
             return 0;
         }
 
-        
+        XMLDoc* doc = new XMLDoc();
+
+        char c;
+
+
+
     }
 
 

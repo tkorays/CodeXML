@@ -60,8 +60,14 @@ namespace tk {
         string                  version;
         string                  encoding;
         XMLNode*                root;
-        uint32_t                err;
-        static map<uint16_t,string> errInfo;
+
+        typedef enum {
+            xml_st_lt, // <
+            xml_st_gt, // >
+            xml_st_eq, // =
+            xml_st_qs, // ?
+            xml_st_qt, // "
+        }xml_state;
     public:
         XMLDoc();
         ~XMLDoc();
@@ -75,6 +81,7 @@ namespace tk {
 
         static XMLDoc* loadFromFile(string fn);
         static XMLDoc* loadFromString(string s);
+
     };
 };
 
