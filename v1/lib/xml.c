@@ -9,7 +9,7 @@
 // < > & " '
 
 // local definitions
-
+static size_t parse_xml_to_list(xml_doc_t* doc, const char* data, size_t size, size_t offset);
 
 xml_raw_item_t* xml_raw_item_create(mem_pool_t* pool,int type, const char* data, size_t size){
     xml_raw_item_t* item;
@@ -55,16 +55,14 @@ xml_doc_t* xml_doc_create(){
     return doc;
 }
 
+
 xml_doc_t* xml_doc_load(const char* filename){
     xml_doc_t*      doc;
     FILE*           fh;
     void*           data;
     char            buf[XML_STRING_MAX_SIZE];
-    char            ch;
     size_t          read_size;
-    size_t          i,j;
-    long            read_pos;
-    char            tag_not_close = 0;
+    int             read_num;
 
     if(!filename){
         return 0;
@@ -74,150 +72,182 @@ xml_doc_t* xml_doc_load(const char* filename){
         return 0;
     }
 
-    doc = xml_doc_create(); // no more check
-
+    // 读取文件,按一个个元素分割
     while(feof(fh)==0) {
         read_size = fread(buf,1,XML_STRING_MAX_SIZE,fh);
-        i = 0;
-        while(i < read_size){
-            ch = buf[i];
+        read_num = parse_xml_to_list(doc,buf,read_size,0);
+
+        if(read_num == 0){
+            break;
+        }
+        // 回退
+        if(read_num < read_size) {
+            fseek(fh, read_num, SEEK_CUR);
+            continue;
+        }
+
+    }
+    fclose(fh);
+
+
+    if(read_num == 0){
+        return 0;
+    }
+    doc = xml_doc_create(); // no more check
+    // 状态鸡...
+
+    return doc;
+}
+
+
+// this is a local function
+// 返回读取字节数,如果出错则返回0
+size_t parse_xml_to_list(xml_doc_t* doc, const char* data, size_t size, size_t offset){
+    size_t  i,j;
+    const char*   buf = data;
+    char    ch;
+    int     tag_not_close = 0;      // 标签是否闭合,xml <>内外字符串处理与区别
+    int     read_num = 0;
+
+    i = offset;
+    while(i<size){
+        ch = data[i];
+
+        // 标签没有关闭,只处理 空白 换行 > = " / - ? name 标签字符串
+        if(tag_not_close){
             switch(ch){
                 case ' ':
                 case '\t':
-                    if(doc->_raw_item_cur->type == item_type_sep) break;
+                    if(doc->_raw_item_cur->type == item_type_sep) break; // 多个分割合并为一个
                     doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_sep,0,0);
                     doc->_raw_item_cur = doc->_raw_item_cur->next;
-                    break;
-                case '<':
-                    doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_lt,0,0);
-                    doc->_raw_item_cur = doc->_raw_item_cur->next;
-                    tag_not_close = 1;
+                    read_num += 1;
                     break;
                 case '>':
                     doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_gt,0,0);
                     doc->_raw_item_cur = doc->_raw_item_cur->next;
                     tag_not_close = 0;
+                    read_num += 1;
                     break;
                 case '=':
                     doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_eq,0,0);
                     doc->_raw_item_cur = doc->_raw_item_cur->next;
+                    read_num += 1;
                     break;
                 case '/':
                     doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_slash,0,0);
                     doc->_raw_item_cur = doc->_raw_item_cur->next;
+                    read_num += 1;
                     break;
                 case '-':
                     doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_minus,0,0);
                     doc->_raw_item_cur = doc->_raw_item_cur->next;
+                    read_num += 1;
+                    break;
+                case '?':
+                    doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_qs,0,0);
+                    doc->_raw_item_cur = doc->_raw_item_cur->next;
+                    read_num += 1;
                     break;
                 case '\r':
                 case '\n':
-                    break;
+                    read_num += 1;
+                    break; // 回车换行直接跳过
                 case '"':
-                    // attribute value
-                    if(tag_not_close) {
-                        j = i + 1;
-                        while (j < read_size) {
-                            // 我怎么会写出这样的代码!!! : if(j == '"') {
-                            if (buf[j] == '"') {
-                                doc->_raw_item_cur->next = xml_raw_item_create(doc->pool, item_type_qt, 0, 0);
-                                doc->_raw_item_cur = doc->_raw_item_cur->next;
+                    j = i + 1;
+                    while (j < size) {
+                        if (buf[j] == '"') {
+                            doc->_raw_item_cur->next = xml_raw_item_create(doc->pool, item_type_qt, 0, 0);
+                            doc->_raw_item_cur = doc->_raw_item_cur->next;
 
-                                doc->_raw_item_cur->next = xml_raw_item_create(doc->pool, item_type_str, buf + i + 1,
-                                                                               j - i - 1);
-                                doc->_raw_item_cur = doc->_raw_item_cur->next;
+                            doc->_raw_item_cur->next = xml_raw_item_create(doc->pool, item_type_str, buf + i + 1,
+                                                                           j - i - 1);
+                            doc->_raw_item_cur = doc->_raw_item_cur->next;
 
-                                doc->_raw_item_cur->next = xml_raw_item_create(doc->pool, item_type_qt, 0, 0);
-                                doc->_raw_item_cur = doc->_raw_item_cur->next;
+                            doc->_raw_item_cur->next = xml_raw_item_create(doc->pool, item_type_qt, 0, 0);
+                            doc->_raw_item_cur = doc->_raw_item_cur->next;
 
-                                i = j;
-                                break;
-                            }
-                            j++;
+                            read_num += (j-i+1);
+                            i = j;
+                            break;
                         }
-                        if (j == read_size) {
-                            // force to read from current "
-                            read_pos = ftell(fh);
-                            read_pos -= (read_size - i);
-                            fseek(fh, read_pos, SEEK_SET);
-                            i = read_size;
+                        j++;
+                    }
+                    if (j == size) {
+                        // 在1024字节中都没有找到匹配的",说明字符串太长,返回错误
+                        if(size-i >= XML_STRING_MAX_SIZE){
+                            return 0;
                         }
-                    }else{ // common inner text, read until '<'
-                        j = i;
-                        while(j < read_size){
-                            if(buf[j] == '<'){
-                                doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_str,buf+i,j-i);
-                                doc->_raw_item_cur = doc->_raw_item_cur->next;
-
-                                doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_lt,0,0);
-                                doc->_raw_item_cur = doc->_raw_item_cur->next;
-                                tag_not_close = 1;
-                                i = j;
-                                break;
-                            }
-                            j++;
-                        }
-                        if(j==read_size){
-                            // force to read from current "
-                            read_pos = ftell(fh);
-                            read_pos -= (read_size-i);
-                            fseek(fh,read_pos,SEEK_SET);
-                            i = read_size;
-                        }
+                        // 字符长不够,直接返回
+                        return i;
                     }
                     break;
                 default:
-                    // attribute name
-                    if(tag_not_close){
-                        j = i;
-                        while(j < read_size){
-                            if(buf[j] == '=' || buf[j] == ' ' || buf[j] == '\t'
-                               || buf[j] == '\r' || buf[j] == '\n' || buf[j] == '/'
-                               || buf[j] == '>'){
-                                doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_str,buf+i,j-i);
-                                doc->_raw_item_cur = doc->_raw_item_cur->next;
-                                i = j-1;
-                                break;
-                            }
-                            j++;
+                    j = i;
+                    while(j < size){
+                        if(buf[j] == '=' || buf[j] == ' ' || buf[j] == '\t'
+                           || buf[j] == '\r' || buf[j] == '\n' || buf[j] == '/'
+                           || buf[j] == '>'){
+                            doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_str,buf+i,j-i);
+                            doc->_raw_item_cur = doc->_raw_item_cur->next;
+                            read_num += (j-i);
+                            i = j-1;
+                            break;
                         }
-                        if(j==read_size){
-                            // force to read from current "
-                            read_pos = ftell(fh);
-                            read_pos -= (read_size-i);
-                            fseek(fh,read_pos,SEEK_SET);
-                            i = read_size;
-                        }
-                    }else{ // common inner text ,read untl <
-                        j = i;
-                        while(j < read_size){
-                            if(buf[j] == '<'){
-                                doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_str,buf+i,j-i);
-                                doc->_raw_item_cur = doc->_raw_item_cur->next;
-
-                                doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_lt,0,0);
-                                doc->_raw_item_cur = doc->_raw_item_cur->next;
-                                tag_not_close = 1;
-                                i = j;
-                                break;
-                            }
-                            j++;
-                        }
-                        if(j==read_size){
-                            // force to read from current "
-                            read_pos = ftell(fh);
-                            read_pos -= (read_size-i);
-                            fseek(fh,read_pos,SEEK_SET);
-                            i = read_size;
-                        }
+                        j++;
                     }
-
+                    if(j==size){
+                        // 在1024字节中都没有找到匹配的",说明字符串太长,返回错误
+                        if(size-i >= XML_STRING_MAX_SIZE){
+                            return 0;
+                        }
+                        // 字符长不够
+                        return i;
+                    }
                     break;
             }
-            i++;
+        }else{ // 标签关闭会,除了< ,其他均按照字符处理(指导遇到<)
+            switch(ch){
+                case ' ':
+                case '\t':
+                case '\r':
+                case '\n':
+                    if(doc->_raw_item_cur->type == item_type_sep) break; // 多个分割合并为一个
+                    doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_sep,0,0);
+                    doc->_raw_item_cur = doc->_raw_item_cur->next;
+                    read_num += 1;
+                    break;
+                case '<':
+                    doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_lt,0,0);
+                    doc->_raw_item_cur = doc->_raw_item_cur->next;
+                    read_num += 1;
+                    tag_not_close = 1;
+                    break;
+                    // 读取inner text
+                default:
+                    j = i;
+                    while(j < size){
+                        if(buf[j] == '<'){
+                            doc->_raw_item_cur->next = xml_raw_item_create(doc->pool,item_type_str,buf+i,j-i);
+                            doc->_raw_item_cur = doc->_raw_item_cur->next;
+                            read_num += (j-i);
+                            i = j-1;
+                            break;
+                        }
+                        j++;
+                    }
+                    if(j==size){
+                        // 在1024字节中都没有找到匹配的",说明字符串太长,返回错误
+                        if(size-i >= XML_STRING_MAX_SIZE){
+                            return 0;
+                        }
+                        // 字符长不够
+                        return i;
+                    }
+                    break;
+            }
         }
+        i++;
     }
-
-    fclose(fh);
-    return doc;
+    return read_num;
 }
