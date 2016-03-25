@@ -16,13 +16,15 @@ typedef struct data_item {
     char        name[16];
     uint16_t    bytes;
     uint16_t    bits;
+    char*       data;
 } data_item_t;
 
 // "dst_mac,6,0;src_mac,6,0;type,2,0";
 
+// 全局共享
 class DataRule {
 public:
-    DataRule(string rule);  // 从字符串中解析出rule
+    DataRule(string name,string rule);  // 从字符串中解析出rule
     vector<data_item_t> getItemInfo(); // 获取rule信息
     string getName() const {return name;} // 该rule名字
     bool appendItem(data_item_t a); // 加入一个字段
@@ -33,15 +35,20 @@ private:
 
 
 class DataStruct {
+    friend fstream& operator>>(fstream fs,DataStruct& ds);
 public:
-    bool parse(const char* dt, size_t size, DataRule* info);
+    DataStruct(const DataRule* info);
     uint64_t getInt(string name);
+    uint64_t getInt(size_t index);
     const char* getRaw(string name);
+    const char* getRaw(size_t index);
 private:
     char*       data;
     size_t      size;
 protected:
 };
 
+fstream& operator>>(fstream fs,DataStruct& ds);
+fstream& operator<<(fstream fs,DataStruct& ds);
 
 #endif //PCAPREADER_DATAPARSER_H
