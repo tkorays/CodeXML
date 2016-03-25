@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <map>
 using namespace std;
 #include <stdint.h>
 #include <stddef.h>
@@ -31,6 +32,13 @@ public:
 private:
     vector<data_item_t> items;
     string name;
+};
+
+// singleton
+class DataRuleManager {
+public:
+    static DataRule* get(string name);
+    static bool add(string name ,string rule);
 };
 
 

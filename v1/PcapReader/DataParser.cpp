@@ -4,19 +4,35 @@
 #include "DataParser.h"
 
 #include <fstream>
+#include <iostream>
 using namespace std;
 
 int main(){
-    fstream fs("abc",ios::out | ios::in);
+    // 试着用它去解析一个pcap文件:
+    fstream ff("a.cap",ios::out | ios::in);
 
-    DataStruct eth(new DataRule("eth","dst_mac,6,0;src_mac,6,0;type,2,0"));
-    eth.getInt("dst_mac");
-    const char* dt  = eth.getRaw("src_mac");
-    fs>>eth;
+    DataRuleManager::add("pcap_file_header","...");
+    DataRuleManager::add("pkthdr","");
+    DataRuleManager::add("eth","...");
+    DataRuleManager::add("ipv4","...");
+    DataRuleManager::add("udp","...");
 
-    DataStruct ipv4(new DataRule("ipv4","..."));
-    fs>>ipv4;
-    ipv4.getInt("version");
+    DataStruct pcap_fh(DataRuleManager::get("pcap_file_header"));
+    ff>>pcap_fh;
+    cout<<pcap_fh.getInt("magic");
+
+    DataStruct pkthdr(DataRuleManager::get("pkthdr"));
+    uint64_t datalen = pkthdr.getInt("len");
+
+    DataStruct eth(DataRuleManager::get("eth"));
+    ff>>eth;
+    cout<<eth.getInt(0);
+
+    DataStruct ipv4(DataRuleManager::get("ipv4"));
+    ff>>ipv4;
+    cout<<ipv4.getInt("version");
+
+
 
     return 0;
 }
