@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -36,7 +36,7 @@ void *mem_pool_alloc(mem_pool_t *pool, size_t n);
 
 size_t mem_pool_block_num(mem_pool_t *pool);
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
 
