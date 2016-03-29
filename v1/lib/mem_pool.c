@@ -67,13 +67,15 @@ void* mem_pool_alloc(mem_pool_t* pool, size_t n){
     int             is_size_valid;
     int             left_size;
     mem_block_t*    blk;
+    uintptr_t       addr;
 
     is_size_valid = ( n<=0 )||(n > MEM_POOL_BLOCK_DEFAULT_SIZE);
     if(!pool || !pool->current || is_size_valid){
         return 0;
     }
 
-    left_size = pool->current->end - pool->current->last;
+    addr = ADDR_ALIGN(pool->current->last,ALIGN_SIZE);
+    left_size = pool->current->end - addr; /* may <= 0 */
     if(n > left_size){
         blk = mem_block_create();
         if(!blk){

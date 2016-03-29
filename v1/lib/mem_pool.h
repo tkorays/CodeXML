@@ -8,6 +8,7 @@ extern "C" {
 #endif
 
 #define MEM_POOL_BLOCK_DEFAULT_SIZE 1024
+#define ALIGN_SIZE 4
 #define ADDR_ALIGN(d,a) (((d)+(a-1)) & ~(a-1))
 
 
