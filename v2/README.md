@@ -14,8 +14,21 @@ handle (*call)(const char* para,size_t len);
 
 或者让程序自动扫描
 
- 支持help输出导出函数
+支持help输出导出函数
+ 
+<load name="foo_module" file="foo.dylib" />
+<unload name="foo_module" />
+<foo_module call="hello" param="" />
 
+
+内部管理plugin模式
+resource {
+    name,
+    handle,
+    free_func // 离开作用于后自动释放资源
+}
+
+ResourceManage
 
 
 3) 支持调用系统脚本
