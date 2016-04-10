@@ -4,7 +4,10 @@
 
 #include <string.h>
 
-// 调用者不关心命令是以什么存储的,这里只要提供注册,查询
+typedef struct {
+    char        name[CX_CMD_NAME_SIZE];
+    CX_CMD_FUNC func;
+} CX_CmdInfo;
 
 typedef struct _CmdInfo {
     CX_CmdInfo          cmd;
