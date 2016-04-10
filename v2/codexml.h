@@ -14,10 +14,10 @@ typedef CX_RET (*CX_CMD_FUNC)(CX_NodePtr node);
 
 typedef enum {
     CX_SUCCESS=0,
-    CX_FAILED,
-    CX_MEMERR,
+        CX_FAILED,
+        CX_MEMERR,
 
-    CX_CODE_NUM
+        CX_CODE_NUM
 };
 
 char* CX_GetCodeInfo(CX_CODE code);
