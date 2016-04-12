@@ -8,6 +8,11 @@ typedef struct {
     char    desc[64];
 } ErrorInfo;
 
+static XML_RET XML_ParseStatement(const char* str, int size, XML_Doc_t* doc);
+static XML_RET XML_ParseNode(const char* str, int size,XML_Node_t* node);
+static XML_RET XML_ParseNodeName(const char* str, int size, XML_Node_t* node);
+static XML_RET XML_ParseNodeAttr(const char* str,int size, XML_Node_t* node);
+
 // by index
 ErrorInfo g_ErrInfo[XML_CODE_NUM] = {
         {XML_SUCCESS,"Success"},
