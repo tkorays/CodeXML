@@ -1,5 +1,4 @@
 #include "codexml.h"
-#include "mem_pool.h
 #include "mem_pool.h"
 
 #include <string.h>
